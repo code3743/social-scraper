@@ -1,4 +1,4 @@
-const XProvider = require("./providers/x_provider");
+const XProvider = require("./providers/x-provider");
 const main = async () => {
     const xProvider = new XProvider();
     const isLoggedIn =  await xProvider.init();

@@ -1,8 +1,8 @@
 const fs = require('fs');
 const { chromium, Page } = require('playwright-chromium');
 
-const verifyLogin = require('../utils/verify_login');
-const exportResult = require('../utils/export_result');
+const verifyLogin = require('../utils/verify-login');
+const exportResult = require('../utils/export-result');
 const Post = require('../models/post');
 
 class Scraper {
