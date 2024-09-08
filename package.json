@@ -15,6 +15,7 @@
   "author": "code3743",
   "license": "MIT",
   "dependencies": {
+    "inquirer": "^10.2.2",
     "playwright-chromium": "^1.47.0"
   }
 }
