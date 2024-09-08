@@ -1,0 +1,20 @@
+{
+  "name": "social-scraper",
+  "version": "0.0.1",
+  "description": "Social Scraper is a web scraping tool designed to collect and analyze public posts and data from various social media platforms. It supports multiple APIs to gather content from networks such as Twitter, Reddit, and more, providing a streamlined way to aggregate and process social media data for research and analysis.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "API",
+    "WEB",
+    "SCRAPING",
+    "SOCIAL"
+  ],
+  "author": "code3743",
+  "license": "MIT",
+  "dependencies": {
+    "playwright-chromium": "^1.47.0"
+  }
+}
