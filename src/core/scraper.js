@@ -87,6 +87,9 @@ class Scraper {
      * @private
      */
     async #destroySession() {
+        if (!fs.existsSync(`storage/${this.providerName}-storage.json`)) {
+            return;
+        }
         fs.unlinkSync(`storage/${this.providerName}-storage.json`); // Delete the session file
     }
 
