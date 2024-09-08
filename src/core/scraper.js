@@ -96,10 +96,11 @@ class Scraper {
      * accessing the target page, extracting post information, and storing it in the `this.posts` array.
      * @param {number} limitPosts - Maximum number of posts to extract.
      * @param {string} user - The username or identifier of the account from which to scrape posts.
+     * @param {boolean} headless - Specifies whether the browser should run in headless mode.
      * @returns {Promise<void>}
      * @throws {Error} - If the method is not implemented in the child class.
      */
-    async scrape(limitPosts, user) {
+    async scrape(limitPosts, user, headless) {
         throw new Error('Implement this method in the provider class'); // Error if not implemented
     }
 

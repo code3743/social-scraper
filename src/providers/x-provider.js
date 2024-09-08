@@ -23,13 +23,14 @@ class XProvider extends Scraper {
    * Scrapes posts from a given user's timeline on X (formerly Twitter).
    * @param {number} limitPosts - The maximum number of posts to scrape.
    * @param {string} user - The username of the profile to scrape posts from.
+   * @param {boolean} headless - Specifies whether the browser should run in headless mode (no UI).
    * @throws {Error} - Throws an error if limitPosts or user is not provided.
    */
-  async scrape(limitPosts, user) {
+  async scrape(limitPosts, user, headless = true) {
     if (!limitPosts || !user) {
       throw new Error("Parameters limitPosts and user are required");
     }
-    const page = await this.getCurrentPageContext();
+    const page = await this.getCurrentPageContext(headless);
     await this.#interceptRequest(page);
     await page.goto(`https://x.com/${user}`);
     await page.waitForLoadState();
