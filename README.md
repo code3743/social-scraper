@@ -1,7 +1,3 @@
-Aquí tienes el README traducido al inglés:
-
----
-
 # Social Scraper
 
 ## Description
