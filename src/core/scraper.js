@@ -1,37 +1,44 @@
-const { chromium, Page} = require('playwright-chromium');
-const verifyLogin = require('../utils/verify_login');
 const fs = require('fs');
-const exportResult = require('../utils/export_result');
+const { chromium, Page } = require('playwright-chromium');
 
+const verifyLogin = require('../utils/verify_login');
+const exportResult = require('../utils/export_result');
+const Post = require('../models/post');
 
 class Scraper {
     /**
-     * @param {string} providerName 
+     * Constructor for the Scraper class.
+     * @param {string} providerName - Name of the provider or social media platform (e.g., 'instragram', 'facebook').
      */
     constructor(providerName) {
         this.providerName = providerName;
         this.browser = null;
         this.page = null;
-        this.posts = [];
+        this.posts = []; // Array to store the scraped posts
     }
-    
+
     /**
-     * 
-     * @param {boolean?} headless 
+     * Launches the Playwright browser and loads the storage state (cookies, session, etc.)
+     * if a session file for the provider exists.
+     * @param {boolean?} headless - Specifies whether the browser should run in headless mode (no UI).
      */
     async launchBrowser(headless = true) {
-        const browser = await chromium.launch({headless});
-        const storage = fs.existsSync(`storage/${this.providerName}-storage.json`) ? JSON.parse(fs.readFileSync(`storage/${this.providerName}-storage.json`)) : undefined;
-        this.browser =  await browser.newContext({
-                userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
-                locale: 'es-ES',
-                storageState: storage
+        const browser = await chromium.launch({ headless });
+        const storage = fs.existsSync(`storage/${this.providerName}-storage.json`) 
+            ? JSON.parse(fs.readFileSync(`storage/${this.providerName}-storage.json`)) 
+            : undefined;
+        this.browser = await browser.newContext({
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
+            locale: 'es-ES',
+            storageState: storage
         });
     }
 
     /**
-     * @param {string} url 
-     * @returns {Promise<boolean>}
+     * Navigates to the login page, verifies if login is successful, 
+     * saves the session, and closes the browser.
+     * @param {string} url - URL of the login page.
+     * @returns {Promise<boolean>} - Returns true if login is successful, otherwise false.
      */
     async loginPage(url) {
         await this.launchBrowser(false);
@@ -39,71 +46,83 @@ class Scraper {
         await this.page.goto(url);
         const responseLogin = await verifyLogin();
         if (!responseLogin) {
-           await this.closeBrowser();
-           return false;
+            await this.closeBrowser();
+            return false;
         }
         await this.#saveSession();
         await this.closeBrowser();
         return true;
     }
-    
+
     /**
-     * 
-     * @param {boolean?} distroySession 
+     * Closes the browser and optionally destroys the saved session.
+     * @param {boolean?} destroySession - If true, the saved session file is deleted.
      */
-    async closeBrowser(distroySession = false) {
-        console.log('Cerrando el navegador...');
-        if (distroySession) {
+    async closeBrowser(destroySession = false) {
+        console.log('Closing the browser...');
+        if (destroySession) {
             await this.#destroySession();
         }
         await this.browser.close();
     }
 
+    /**
+     * Saves the current session state (cookies, local storage) to a JSON file.
+     * This allows the session to be reused in future executions.
+     * @private
+     */
     async #saveSession() {
-        const storageState = await this.browser.storageState();
-        console.log('Guardando la sesión...');
+        const storageState = await this.browser.storageState(); 
+        console.log('Saving the session...');
+
         if (!fs.existsSync('storage')) {
             fs.mkdirSync('storage');
         }
         fs.writeFileSync(`storage/${this.providerName}-storage.json`, JSON.stringify(storageState));
-        console.log('Sesión guardada');
-    }
-
-    async #destroySession() {
-        fs.unlinkSync(`storage/${this.providerName}-storage.json`);
+        console.log('Session saved');
     }
 
     /**
-     * Method that must be implemented by the classes that extend `Scraper`.
-     * This method is responsible for performing the main task of scraping or extracting posts
-     * from a specific provider or platform. During its execution, the method must access the target 
-     * website, extract the desired post information, and then store that information in the `this.posts` array, 
-     * which will later be used to export the results.
-     * @param {number} limitPosts 
-     * @param {string} user 
-     * @returns {Promise<void>}
-     * @throws {Error}
+     * Deletes the saved session file for the current provider.
+     * @private
      */
-    async scrape(limitPosts, user) {
-        throw new Error('Implement this method in the provider class');
+    async #destroySession() {
+        fs.unlinkSync(`storage/${this.providerName}-storage.json`); // Delete the session file
     }
 
+    /**
+     * Abstract method that must be implemented by classes that extend `Scraper`.
+     * This method is responsible for performing the scraping on a specific platform, 
+     * accessing the target page, extracting post information, and storing it in the `this.posts` array.
+     * @param {number} limitPosts - Maximum number of posts to extract.
+     * @param {string} user - The username or identifier of the account from which to scrape posts.
+     * @returns {Promise<void>}
+     * @throws {Error} - If the method is not implemented in the child class.
+     */
+    async scrape(limitPosts, user) {
+        throw new Error('Implement this method in the provider class'); // Error if not implemented
+    }
+
+    /**
+     * Exports the scraped results to a JSON file in the `/results` folder.
+     * The file name includes the provider name and the current date.
+     * @returns {{provider: string, date: Date, posts: Post[]}} - Object containing the exported results.
+     */
     getResults() {
         return exportResult(this.posts, this.providerName, new Date());
     }
 
-    
     /**
-     * @param {boolean?} headless
-     * @returns {Promise<Page>}
+     * Launches the browser in the current context and opens a new page. Useful for obtaining
+     * the current page either in headless or non-headless mode.
+     * @param {boolean?} headless - Specifies whether the browser should run in headless mode.
+     * @returns {Promise<Page>} - Returns the current browser page.
      */
     async getCurrentPageContext(headless = false) {
         await this.launchBrowser(headless);
         this.page = await this.browser.newPage();
         return this.page;
     }
-
 }
-
 
 module.exports = Scraper;

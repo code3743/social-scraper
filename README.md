@@ -1,90 +1,92 @@
+Aquí tienes el README traducido al inglés:
+
+---
+
 # Social Scraper
 
-## Descripción
+## Description
 
-**Social Scraper** es una herramienta de consola desarrollada en **Node.js** que utiliza **Playwright** para realizar web scraping en diversas plataformas de redes sociales.
+**Social Scraper** is a console tool developed in **Node.js** that uses **Playwright** to perform web scraping on various social media platforms.
 
-Actualmente, **Social Scraper** soporta los siguientes proveedores:
+Currently, **Social Scraper** supports the following providers:
 1. **X (Twitter)**
 
-## Características
+## Features
 
-- **Soporte Multiplataforma**: Compatible con diferentes redes sociales mediante proveedores específicos.
-- **Almacenamiento Estructurado**: Guarda los resultados en archivos JSON organizados por nombre de proveedor y fecha.
-- **Análisis de Contenido**: Identifica información sensible en las publicaciones recopiladas.
-- **Gestión de Sesiones**: Maneja sesiones iniciadas para realizar scraping de manera eficiente.
+- **Multi-Platform Support**: Compatible with different social media platforms through specific providers.
+- **Structured Storage**: Saves the results in JSON files, organized by provider name and date.
+- **Content Analysis**: Identifies sensitive information in the collected posts.
+- **Session Management**: Handles active sessions for efficient scraping.
 
-## Instalación
+## Installation
 
-### Requisitos Previos
+### Prerequisites
 
-- **Node.js** (versión 18 o superior)
+- **Node.js** (version 18 or higher)
 - **npm** 
 
-### Pasos de Instalación
+### Installation Steps
 
-1. **Clonar el Repositorio**
+1. **Clone the Repository**
 
     ```bash
     git clone https://github.com/code3743/social-scraper.git
     ```
 
-2. **Navegar al Directorio del Proyecto**
+2. **Navigate to the Project Directory**
 
     ```bash
     cd social-scraper
     ```
 
-3. **Instalar las Dependencias**
+3. **Install Dependencies**
 
     ```bash
     npm install
     ```
 
-## Uso
+## Usage
 
-**Social Scraper** es una herramienta de consola. Para ejecutarla, utiliza el siguiente comando:
+**Social Scraper** is a console-based tool. To run it, use the following command:
 
 ```bash
 node app.js
 ```
 
+### Results
 
-### Resultados
+The results are stored in the `/results` folder as JSON files in the format `providerName-date.json`. Each file contains an array of posts with the following structure:
 
-Los resultados se almacenan en la carpeta `/results` como archivos JSON con el formato `providerName-date.json`. Cada archivo contiene un array de publicaciones con la siguiente estructura:
+- **id**: The post's identifier.
+- **content**: The textual content of the post.
+- **media**: An array of URLs for associated media.
+- **metadata**: An object containing additional relevant information.
 
-- **id**: Identificador de la publicación.
-- **contenido**: Contenido textual de la publicación.
-- **media**: Array de URLs de medios asociados.
-- **metadata**: Objeto con información adicional relevante.
+## Contribution
 
+If you would like to contribute to **Social Scraper**, please follow these steps:
 
-## Contribución
-
-Si deseas contribuir a **Social Scraper**, por favor sigue estos pasos:
-
-1. **Haz un Fork del Repositorio**
-2. **Crea una Rama para tu Funcionalidad o Corrección de Bug**
+1. **Fork the Repository**
+2. **Create a Branch for Your Feature or Bug Fix**
 
     ```bash
-    git checkout -b feature/nueva-funcionalidad
+    git checkout -b feature/new-feature
     ```
 
-3. **Realiza tus Cambios y Confirma tus Commits**
+3. **Make Your Changes and Commit Them**
 
     ```bash
-    git commit -m "Descripción de los cambios"
+    git commit -m "Description of changes"
     ```
 
-4. **Push a tu Rama**
+4. **Push to Your Branch**
 
     ```bash
-    git push origin feature/nueva-funcionalidad
+    git push origin feature/new-feature
     ```
 
-5. **Abre un Pull Request**
+5. **Open a Pull Request**
 
-## Licencia
+## License
 
-Este proyecto está licenciado bajo la **Licencia MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.

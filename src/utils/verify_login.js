@@ -6,28 +6,26 @@ const rl = readline.createInterface({
 });
 
 /**
+ * Prompts the user to confirm whether they have successfully logged in.
+ * This function is used in conjunction with web scraping tasks that require manual login.
  * 
- * @returns {Promise<boolean>}
+ * @returns {Promise<boolean>} - Resolves to true if the user confirms login with 'y', otherwise false.
  */
 const verifyLogin = () => {
   return new Promise((resolve) => {
-    console.log('Por favor, inicie sesión en la página del proveedor.');
-    console.log('Una vez que hayas iniciado sesión, presiona "y" para continuar o cualquier otra tecla para cancelar.');
-
-    rl.question('¿Ya iniciaste sesión? (y/n): ', (answer) => {
-    
+    console.log('Please log in to the provider page.');
+    console.log('Once you have logged in, press "y" to continue or any other key to cancel.');
+    rl.question('Have you logged in? (y/n): ', (answer) => {
       if (answer.toLowerCase() === 'y') {
-        console.log('Sesión iniciada. Continuando...');
+        console.log('Login confirmed. Continuing...');
         resolve(true);  
       } else {
-        console.log('No se pudo iniciar sesión. Cancelando...');
+        console.log('Login not confirmed. Cancelling...');
         resolve(false); 
       }
-      
       rl.close();
     });
   });
 };
-
 
 module.exports = verifyLogin;
