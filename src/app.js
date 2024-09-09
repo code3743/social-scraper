@@ -74,9 +74,10 @@ const runScraper = async (provider, user, limitPosts, requireLogin, headless = t
   }
 
   if (requireLogin) {
-    const isLoggedIn = await scraper.init();
+    const isLoggedIn = await scraper.login();
     if (!isLoggedIn) {
       console.log('Failed to log in. Exiting...');
+      process.exit(1);
       return;
     }
   }

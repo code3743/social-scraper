@@ -1,20 +1,42 @@
 const fs = require('fs');
-const { chromium, Page } = require('playwright-chromium');
+const { chromium, Page, BrowserContext } = require('playwright-chromium');
 
 const verifyLogin = require('../utils/verify-login');
 const exportResult = require('../utils/export-result');
 const Post = require('../models/post');
 
 class Scraper {
+
+    /**
+     * @type {Page} - Current page context.
+     */
+    #page;
+    /**
+     * @type {BrowserContext} - Current browser context.
+     */
+    #browser;
+    /**
+     * @type {string} - Base URL of the provider's website.
+     */
+    #baseUrl;
+    /**
+     * @type {string} - Name of the provider or social media platform.
+     */
+    #providerName;
+    /**
+     * @type {Post[]} - Array to store the scraped posts.
+     */
+    #posts
+
     /**
      * Constructor for the Scraper class.
      * @param {string} providerName - Name of the provider or social media platform (e.g., 'instragram', 'facebook').
+     * @param {string} baseUrl - Base URL of the provider's website (e.g., 'https://www.instagram.com/').
      */
-    constructor(providerName) {
-        this.providerName = providerName;
-        this.browser = null;
-        this.page = null;
-        this.posts = []; // Array to store the scraped posts
+    constructor(providerName, baseUrl) {
+        this.#baseUrl = baseUrl;
+        this.#providerName = providerName;
+        this.#posts = [];
     }
 
     /**
@@ -24,10 +46,11 @@ class Scraper {
      */
     async launchBrowser(headless = true) {
         const browser = await chromium.launch({ headless });
-        const storage = fs.existsSync(`storage/${this.providerName}-storage.json`) 
-            ? JSON.parse(fs.readFileSync(`storage/${this.providerName}-storage.json`)) 
+        const path = `storage/${this.#providerName}-storage.json`;
+        const storage = fs.existsSync(path) 
+            ? JSON.parse(fs.readFileSync(path)) 
             : undefined;
-        this.browser = await browser.newContext({
+        this.#browser = await browser.newContext({
             userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
             locale: 'es-ES',
             storageState: storage
@@ -37,13 +60,13 @@ class Scraper {
     /**
      * Navigates to the login page, verifies if login is successful, 
      * saves the session, and closes the browser.
-     * @param {string} url - URL of the login page.
+     * @param {string?} path - Path to the login page.
      * @returns {Promise<boolean>} - Returns true if login is successful, otherwise false.
      */
-    async loginPage(url) {
+    async login(path) {
         await this.launchBrowser(false);
-        this.page = await this.browser.newPage();
-        await this.page.goto(url);
+        this.page = await this.#browser.newPage();
+        await this.page.goto(`${this.#baseUrl}${path ?? ''}`);
         const responseLogin = await verifyLogin();
         if (!responseLogin) {
             await this.closeBrowser();
@@ -63,7 +86,7 @@ class Scraper {
         if (destroySession) {
             await this.#destroySession();
         }
-        await this.browser.close();
+        await this.#browser.close();
     }
 
     /**
@@ -72,14 +95,18 @@ class Scraper {
      * @private
      */
     async #saveSession() {
-        const storageState = await this.browser.storageState(); 
+        const storageState = await this.#browser.storageState(); 
         console.log('Saving the session...');
 
         if (!fs.existsSync('storage')) {
             fs.mkdirSync('storage');
         }
-        fs.writeFileSync(`storage/${this.providerName}-storage.json`, JSON.stringify(storageState));
+        fs.writeFileSync(`storage/${this.#providerName}-storage.json`, JSON.stringify(storageState));
         console.log('Session saved');
+    }
+
+    get baseUrl() { 
+        return this.#baseUrl;
     }
 
     /**
@@ -87,10 +114,30 @@ class Scraper {
      * @private
      */
     async #destroySession() {
-        if (!fs.existsSync(`storage/${this.providerName}-storage.json`)) {
+        const path = `storage/${this.#providerName}-storage.json`;
+        if (!fs.existsSync(path)) {
             return;
         }
-        fs.unlinkSync(`storage/${this.providerName}-storage.json`); // Delete the session file
+        fs.unlinkSync(path); 
+    }
+
+    /**
+     * Adds a post to the `this.posts` array.
+     * @param {Post} post 
+     * @returns 
+     */
+    addPost(post) {
+        if (!(post instanceof Post)) {
+            throw new Error('The post must be an instance of the Post class');
+        }
+        if(this.#posts.find(p => p.id === post.id)) {
+            return;
+        }
+        this.#posts.push(post);
+    }
+
+    get posts() {
+        return this.#posts;
     }
 
     /**
@@ -113,7 +160,7 @@ class Scraper {
      * @returns {{provider: string, date: Date, posts: Post[]}} - Object containing the exported results.
      */
     getResults() {
-        return exportResult(this.posts, this.providerName, new Date());
+        return exportResult(this.#posts, this.#providerName, new Date());
     }
 
     /**
@@ -124,7 +171,7 @@ class Scraper {
      */
     async getCurrentPageContext(headless = false) {
         await this.launchBrowser(headless);
-        this.page = await this.browser.newPage();
+        this.page = await this.#browser.newPage();
         return this.page;
     }
 }
