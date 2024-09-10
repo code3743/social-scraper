@@ -69,7 +69,7 @@ class XProvider extends Scraper {
    * @param {number} limitPosts - The maximum number of posts to scrape.
    */
   async #interceptRequest(page, limitPosts) {
-    await page.route("**/UserTweets?variables=**", async (route, request) => {
+      await page.route("**/UserTweets**", async (route, request) => {
       await route.continue();
       
       const response = await request.response();
