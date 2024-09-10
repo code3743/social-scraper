@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const XProvider = require('./providers/x-provider'); 
+const listProviders = require('./utils/list-providers');
 
 /**
  * Prompts the user for input and returns a promise that resolves with the user's answers.
@@ -12,7 +12,7 @@ const promptUser = () => {
         type: 'list',
         name: 'provider',
         message: 'Select a social media provider to scrape posts from:',
-        choices: ['x']
+        choices: listProviders(),
       },
       {
         type: 'confirm',
@@ -62,17 +62,9 @@ const promptUser = () => {
  * @param {boolean} headless - Specifies whether the browser should run in headless mode.
  */
 const runScraper = async (provider, user, limitPosts, requireLogin, headless = true) => {
-  let scraper;
-
-  switch (provider.toLowerCase()) {
-    case 'x':
-      scraper = new XProvider();
-      break;
-    default:
-      console.log('Provider not supported.');
-      return;
-  }
-
+  const _ = require(`./providers/${provider}`);
+  const scraper = new _();
+ 
   if (requireLogin) {
     const isLoggedIn = await scraper.login();
     if (!isLoggedIn) {
