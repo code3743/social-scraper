@@ -6,6 +6,7 @@
 
 Currently, **Social Scraper** supports the following providers:
 1. **X (Twitter)**
+2. **Instagram**
 
 ## Features
 
