@@ -11,7 +11,6 @@ Currently, **Social Scraper** supports the following providers:
 
 - **Multi-Platform Support**: Compatible with different social media platforms through specific providers.
 - **Structured Storage**: Saves the results in JSON files, organized by provider name and date.
-- **Content Analysis**: Identifies sensitive information in the collected posts.
 - **Session Management**: Handles active sessions for efficient scraping.
 
 ## Installation

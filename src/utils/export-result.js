@@ -18,6 +18,7 @@ const exportResult = (result, providerName, date) => {
         fs.mkdirSync('results');
     }
     fs.writeFileSync(`results/${providerName}-${date.toISOString()}.json`, JSON.stringify(data));
+    console.log(`Scraped data has been exported to results/${providerName}-${date.toISOString()}.json`);
     return data;
 };
 
