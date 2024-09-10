@@ -8,10 +8,6 @@ const Post = require('../models/post');
 class Scraper {
 
     /**
-     * @type {Page} - Current page context.
-     */
-    #page;
-    /**
      * @type {BrowserContext} - Current browser context.
      */
     #browser;
@@ -65,8 +61,8 @@ class Scraper {
      */
     async login(path) {
         await this.launchBrowser(false);
-        this.page = await this.#browser.newPage();
-        await this.page.goto(`${this.#baseUrl}${path ?? ''}`);
+        const page = await this.#browser.newPage();
+        await page.goto(`${this.#baseUrl}${path ?? ''}`);
         const responseLogin = await verifyLogin();
         if (!responseLogin) {
             await this.closeBrowser();
@@ -171,8 +167,8 @@ class Scraper {
      */
     async getCurrentPageContext(headless = false) {
         await this.launchBrowser(headless);
-        this.page = await this.#browser.newPage();
-        return this.page;
+        const page = await this.#browser.newPage();
+        return page;
     }
 }
 
